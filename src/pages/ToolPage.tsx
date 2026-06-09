@@ -518,7 +518,7 @@ function Step4({
                     refill={refill}
                     layoutMode={setting.layoutMode}
                     holeSide={setting.holeSide}
-                    showHoleMarks={false}
+                    showHoleMarks
                     showCutLines={false}
                     className="h-full w-full"
                   />
