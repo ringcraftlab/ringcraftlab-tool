@@ -10,6 +10,8 @@ type RefillPreviewProps = {
   showHoleMarks?: boolean
   showCutLines?: boolean
   showEdgeWarning?: boolean
+  /** trueのとき親要素がサイズを制御するのでaspectRatioを適用しない */
+  fillParent?: boolean
   className?: string
 }
 
@@ -21,6 +23,7 @@ export function RefillPreview({
   showHoleMarks = true,
   showCutLines = true,
   showEdgeWarning = false,
+  fillParent = false,
   className = '',
 }: RefillPreviewProps) {
   const pattern = HOLE_PATTERNS[refill.holePatternId]
@@ -30,8 +33,14 @@ export function RefillPreview({
 
   return (
     <div
-      className={['relative overflow-hidden bg-white border border-[#ddd6c8]', className].join(' ')}
-      style={{ aspectRatio: `${refill.widthMm}/${refill.heightMm}` }}
+      className={['relative bg-white border border-[#ddd6c8]', className].join(' ')}
+      style={{
+        // fillParent=trueのとき親がサイズを決めるのでaspectRatioは不要
+        ...(fillParent ? {} : { aspectRatio: `${refill.widthMm}/${refill.heightMm}` }),
+        // clipPathはoverflow:hiddenより確実に子要素をクリップする
+        overflow: 'hidden',
+        isolation: 'isolate',
+      }}
     >
       {/* 端切れ警告エリア */}
       {showEdgeWarning && (

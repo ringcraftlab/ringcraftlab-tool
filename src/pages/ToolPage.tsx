@@ -506,6 +506,7 @@ function Step4({
                     top: `${(slot.yMm / layout.pageHeightMm) * 100}%`,
                     width: `${(slot.widthMm / layout.pageWidthMm) * 100}%`,
                     height: `${(slot.heightMm / layout.pageHeightMm) * 100}%`,
+                    isolation: 'isolate',
                   }}
                 >
                   {/* カット線（外枠） */}
@@ -517,8 +518,9 @@ function Step4({
                     refill={refill}
                     layoutMode={setting.layoutMode}
                     holeSide={setting.holeSide}
-                    showHoleMarks
+                    showHoleMarks={false}
                     showCutLines={false}
+                    fillParent
                     className="h-full w-full"
                   />
                 </button>
