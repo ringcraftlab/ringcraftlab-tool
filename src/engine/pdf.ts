@@ -50,9 +50,9 @@ function drawCutLine(
     y: yPt,
     width: widthPt,
     height: heightPt,
-    borderColor: rgb(0.1, 0.1, 0.1),
-    borderWidth: 0.7,
-    opacity: 0.45,
+    borderColor: rgb(0.5, 0.5, 0.5),
+    borderWidth: 0.5,
+    opacity: 0.35,
   })
 }
 
@@ -68,9 +68,10 @@ function drawHoleMarks(
   pageHeightPt: number,
 ) {
   const pattern = HOLE_PATTERNS[refill.holePatternId]
+  // プレビューと合わせて安全ゾーンの中央に配置
   const holeXMm = holeSide === 'left'
-    ? slot.xMm + pattern.markerSizeMm
-    : slot.xMm + slot.widthMm - pattern.markerSizeMm
+    ? slot.xMm + pattern.safetyZoneMm / 2
+    : slot.xMm + slot.widthMm - pattern.safetyZoneMm / 2
 
   for (const offsetMm of pattern.centerOffsetsMm) {
     const centerYMm = slot.yMm + slot.heightMm / 2 + offsetMm
@@ -78,8 +79,8 @@ function drawHoleMarks(
     const cy = pageHeightPt - mmToPt(centerYMm)
     const arm = mmToPt(pattern.markerSizeMm / 2)
 
-    page.drawLine({ start: { x: cx - arm, y: cy }, end: { x: cx + arm, y: cy }, thickness: 0.8, color: rgb(0.2, 0.2, 0.2), opacity: 0.7 })
-    page.drawLine({ start: { x: cx, y: cy - arm }, end: { x: cx, y: cy + arm }, thickness: 0.8, color: rgb(0.2, 0.2, 0.2), opacity: 0.7 })
+    page.drawLine({ start: { x: cx - arm, y: cy }, end: { x: cx + arm, y: cy }, thickness: 0.6, color: rgb(0.4, 0.4, 0.4), opacity: 0.55 })
+    page.drawLine({ start: { x: cx, y: cy - arm }, end: { x: cx, y: cy + arm }, thickness: 0.6, color: rgb(0.4, 0.4, 0.4), opacity: 0.55 })
   }
 }
 

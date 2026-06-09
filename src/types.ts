@@ -22,7 +22,7 @@ export type RefillImage = {
   transform: TransformState
 }
 
-export type HolePatternId = 'mini5' | 'mini6' | 'bible' | 'a5'
+export type HolePatternId = 'mini5' | 'mini6' | 'bible' | 'a5' | 'none'
 
 export type MarkerType = 'cross' | 'circle'
 
