@@ -520,7 +520,6 @@ function Step4({
                     holeSide={setting.holeSide}
                     showHoleMarks={false}
                     showCutLines={false}
-                    fillParent
                     className="h-full w-full"
                   />
                 </button>
