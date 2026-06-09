@@ -97,8 +97,8 @@ function findBestGrid(
       const capacity = cols * rows
       if (capacity < desiredCount) continue
 
-      const marginX = (pageWidthMm - cols * refill.widthMm) / (cols + 1)
-      const marginY = (pageHeightMm - rows * refill.heightMm) / (rows + 1)
+      const marginX = Math.max(1, (pageWidthMm - cols * refill.widthMm) / (cols + 1))
+      const marginY = Math.max(1, (pageHeightMm - rows * refill.heightMm) / (rows + 1))
       const waste = capacity - desiredCount
 
       if (!best || waste < best.waste || (waste === best.waste && marginX + marginY > best.marginX + best.marginY)) {

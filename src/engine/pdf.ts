@@ -1,4 +1,4 @@
-import { PDFDocument, degrees, rgb } from 'pdf-lib'
+import { PDFDocument, PDFNumber, PDFOperator, degrees, popGraphicsState, pushGraphicsState, rgb } from 'pdf-lib'
 import { HOLE_PATTERNS } from '../constants'
 import type { HoleSide, LayoutMode, PageLayout, RefillSize } from '../types'
 import { getDrawRect, getImageArea, mmToPt } from './layout'
@@ -103,12 +103,13 @@ function drawImageOnPage(
   const rotation = image.transform.rotation
   const isSwapped = rotation === 90 || rotation === 270
 
-  // mm → pt 変換
+  // 画像エリアのPD座標
   const areaXPt = mmToPt(slot.xMm + imageArea.xMm)
+  const areaWidthPt = mmToPt(imageArea.widthMm)
   const areaHeightPt = mmToPt(imageArea.heightMm)
   const areaYPt = pageHeightPt - mmToPt(slot.yMm + imageArea.yMm) - areaHeightPt
 
-  // 回転補正：プレビューと同じ計算
+  // 回転補正
   const naturalW = isSwapped ? draw.heightMm : draw.widthMm
   const naturalH = isSwapped ? draw.widthMm : draw.heightMm
   const offsetX = isSwapped ? (draw.widthMm - draw.heightMm) / 2 : 0
@@ -117,6 +118,19 @@ function drawImageOnPage(
   const drawXPt = areaXPt + mmToPt(draw.xMm + offsetX)
   const drawYPt = areaYPt + mmToPt(draw.yMm + offsetY)
 
+  // 画像エリアでクリップしてから描画（avoid-ringの安全ゾーンへのはみ出しを防ぐ）
+  page.pushOperators(
+    pushGraphicsState(),
+    PDFOperator.of('re', [
+      PDFNumber.of(areaXPt),
+      PDFNumber.of(areaYPt),
+      PDFNumber.of(areaWidthPt),
+      PDFNumber.of(areaHeightPt),
+    ]),
+    PDFOperator.of('W'),  // クリップパスを設定
+    PDFOperator.of('n'),  // パスを描画せず終了
+  )
+
   page.drawImage(embedded, {
     x: drawXPt,
     y: drawYPt,
@@ -124,6 +138,8 @@ function drawImageOnPage(
     height: mmToPt(naturalH),
     rotate: degrees(rotation),
   })
+
+  page.pushOperators(popGraphicsState())
 }
 
 // ---------------------------------------------------------------------------
