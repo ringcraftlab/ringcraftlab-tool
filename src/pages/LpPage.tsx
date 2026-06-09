@@ -36,7 +36,7 @@ export function LpPage() {
           <div className="relative overflow-hidden rounded-[28px] bg-[#eef2f8]">
             {/* ヒーロー画像 */}
             <img
-              src="/hero-system-planner.png"
+              src={`${import.meta.env.BASE_URL}hero-system-planner.png`}
               alt="システム手帳にリフィルを挟んだイメージ"
               className="h-56 w-full object-cover object-center"
             />
