@@ -1,4 +1,4 @@
-import { HOLE_PATTERNS, REFILL_SIZES } from '../constants'
+import { HOLE_PATTERNS } from '../constants'
 import type { HoleSide, LayoutMode, RefillSize } from '../types'
 
 // ---------------------------------------------------------------------------

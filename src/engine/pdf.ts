@@ -122,14 +122,15 @@ function drawImageOnPage(
   // 画像エリアでクリップしてから描画（avoid-ringの安全ゾーンへのはみ出しを防ぐ）
   page.pushOperators(
     pushGraphicsState(),
-    PDFOperator.of('re', [
+    // re: 矩形パス, W: クリップパス設定, n: パス終了（描画なし）
+    PDFOperator.of('re' as Parameters<typeof PDFOperator.of>[0], [
       PDFNumber.of(areaXPt),
       PDFNumber.of(areaYPt),
       PDFNumber.of(areaWidthPt),
       PDFNumber.of(areaHeightPt),
     ]),
-    PDFOperator.of('W'),  // クリップパスを設定
-    PDFOperator.of('n'),  // パスを描画せず終了
+    PDFOperator.of('W' as Parameters<typeof PDFOperator.of>[0]),
+    PDFOperator.of('n' as Parameters<typeof PDFOperator.of>[0]),
   )
 
   page.drawImage(embedded, {
