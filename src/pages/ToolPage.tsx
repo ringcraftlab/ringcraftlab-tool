@@ -38,10 +38,10 @@ type MakeMode = 'multi' | 'repeat'
 type Step = 1 | 2 | 3 | 4
 
 const STEP_LABELS: Record<Step, string> = {
-  1: '画像を選ぶ',
-  2: 'サイズを選ぶ',
-  3: '作り方を選ぶ',
-  4: '確認・PDF出力',
+  1: '写真をアップロード',
+  2: 'リフィルサイズを選択',
+  3: 'レイアウトを選択',
+  4: 'プレビュー＆PDF出力',
 }
 
 // ---------------------------------------------------------------------------
@@ -156,26 +156,30 @@ function Step1({
       </div>
 
       {/* アップロードエリア */}
-      <label className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-dashed border-[#d9cfbe] bg-[#faf6ee] px-4 text-center transition active:bg-blue-50">
-        <svg width="64" height="52" viewBox="0 0 64 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-          {/* 雲 */}
+      <div className="flex flex-col items-center justify-center gap-4 rounded-[24px] border-2 border-dashed border-[#d9cfbe] bg-[#faf6ee] px-6 py-10 text-center">
+        <svg width="56" height="48" viewBox="0 0 64 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M50 36H14C8.477 36 4 31.523 4 26C4 21.048 7.486 16.9 12.16 15.8C12.056 15.21 12 14.612 12 14C12 8.477 16.477 4 22 4C25.174 4 27.994 5.468 29.86 7.772C31.076 6.664 32.708 6 34.5 6C38.366 6 41.5 9.134 41.5 13C41.5 13.17 41.494 13.338 41.482 13.506C42.296 13.18 43.178 13 44.1 13C48.46 13 52 16.54 52 20.9C52 21.27 51.974 21.634 51.924 21.99C55.402 23.138 58 26.37 58 30.2C58 33.978 55.478 37.158 52 38.128" stroke="#c9bfad" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          {/* 矢印（上向き） */}
           <line x1="32" y1="48" x2="32" y2="28" stroke="#ffd24a" strokeWidth="3" strokeLinecap="round"/>
           <polyline points="24,36 32,28 40,36" fill="none" stroke="#ffd24a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <div>
-          <p className="text-base font-bold text-slate-900">写真を選ぶ</p>
-          <p className="mt-1 text-[12px] text-slate-400">JPG / PNG 対応（最大 50枚まで）</p>
+        <p className="text-[13px] text-slate-500">ここに写真をドラッグ＆ドロップ</p>
+        <div className="flex items-center gap-3 w-full">
+          <div className="flex-1 h-px bg-[#e0d9ce]" />
+          <span className="text-[12px] text-slate-400">または</span>
+          <div className="flex-1 h-px bg-[#e0d9ce]" />
         </div>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          className="hidden"
-          onChange={(e) => e.target.files && onUpload(e.target.files)}
-        />
-      </label>
+        <label className="flex h-11 w-full cursor-pointer items-center justify-center rounded-[12px] bg-[#ffd24a] text-[14px] font-bold text-slate-900 shadow-[0_6px_16px_rgba(255,210,74,0.45)] active:opacity-80">
+          写真を選ぶ
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => e.target.files && onUpload(e.target.files)}
+          />
+        </label>
+        <p className="text-[11px] text-slate-400">JPG / PNG 対応（最大 50枚まで）</p>
+      </div>
 
       {/* 選択済み画像一覧（ソート可能） */}
       {images.length > 0 && (
@@ -790,7 +794,7 @@ export function ToolPage() {
               type="button"
               onClick={nextStep}
               disabled={!canProceed()}
-              className="flex h-14 flex-1 items-center justify-center rounded-[18px] bg-[#ffd24a] text-sm font-black text-slate-950 shadow-[0_8px_20px_rgba(255,210,74,0.25)] disabled:opacity-40"
+              className="flex h-14 flex-1 items-center justify-center rounded-[18px] bg-[#ffd24a] text-sm font-black text-slate-950 shadow-[0_8px_24px_rgba(255,210,74,0.5)] disabled:opacity-40"
             >
               次へ →
             </button>
