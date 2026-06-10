@@ -25,7 +25,7 @@ export function LpPage() {
       {/* ヘッダー */}
       <header className="px-4 pt-5">
         <div className="mx-auto max-w-md">
-          <p style={{ fontFamily: "'M PLUS Rounded 1c', sans-serif" }} className="font-black text-[1.1rem] text-[#31589a]">RingCraftLab</p>
+          <p style={{ fontFamily: "'Noto Sans JP', sans-serif" }} className="font-black text-[1.1rem] text-[#31589a]">RingCraftLab</p>
           <p className="text-[11px] font-bold text-slate-500">Refill Maker</p>
         </div>
       </header>
@@ -48,7 +48,7 @@ export function LpPage() {
             <div className="absolute inset-y-0 left-0 flex w-[60%] flex-col justify-between p-5">
               <div>
                 <p className="text-[10px] font-bold tracking-[0.12em] text-blue-700">SMARTPHONE TO PLANNER</p>
-                <h1 style={{ fontFamily: "'M PLUS Rounded 1c', sans-serif" }} className="mt-2 text-[1.65rem] font-black leading-[1.1] text-slate-950">
+                <h1 style={{ fontFamily: "'Noto Sans JP', sans-serif" }} className="mt-2 text-[1.65rem] font-black leading-[1.1] text-slate-950">
                   スマホの情報を、
                   <br />
                   そのまま手帳へ。
@@ -79,7 +79,7 @@ export function LpPage() {
       <section className="px-4 pb-12">
         <div className="mx-auto max-w-md border-t border-[#e8e0d4] pt-8">
           <p className="text-[11px] font-bold tracking-[0.12em] text-blue-700">EXAMPLES</p>
-          <h2 style={{ fontFamily: "'M PLUS Rounded 1c', sans-serif" }} className="mt-1 text-[1.5rem] font-black leading-tight text-slate-950">
+          <h2 style={{ fontFamily: "'Noto Sans JP', sans-serif" }} className="mt-1 text-[1.5rem] font-black leading-tight text-slate-950">
             こんなものを手帳に入れられます
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -99,7 +99,7 @@ export function LpPage() {
       <section className="px-4 pb-12">
         <div className="mx-auto max-w-md border-t border-[#e8e0d4] pt-8">
           <p className="text-[11px] font-bold tracking-[0.12em] text-blue-700">HOW TO USE</p>
-          <h2 style={{ fontFamily: "'M PLUS Rounded 1c', sans-serif" }} className="mt-1 text-[1.5rem] font-black leading-tight text-slate-950">
+          <h2 style={{ fontFamily: "'Noto Sans JP', sans-serif" }} className="mt-1 text-[1.5rem] font-black leading-tight text-slate-950">
             かんたん4ステップ
           </h2>
           <div className="mt-5 space-y-3">
