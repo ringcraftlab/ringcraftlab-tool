@@ -451,6 +451,7 @@ function Step4({
   onUpdateSetting,
   onExport,
   isExporting,
+  exportError,
 }: {
   images: RefillImage[]
   refill: RefillSize
@@ -460,6 +461,7 @@ function Step4({
   onUpdateSetting: (id: string, patch: Partial<ImageSetting>) => void
   onExport: () => void
   isExporting: boolean
+  exportError: string | null
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const editingImage = images.find((img) => img.id === editingId) ?? null
@@ -544,6 +546,12 @@ function Step4({
         {isExporting ? 'PDFを生成中...' : '印刷する（PDF出力）'}
       </button>
 
+      {exportError && (
+        <p className="rounded-[12px] bg-red-50 px-4 py-3 text-[13px] text-red-600">
+          ⚠️ {exportError}
+        </p>
+      )}
+
       {/* 個別編集ボトムシート */}
       {editingImage && editingSetting && (
         <EditSheet
@@ -609,6 +617,7 @@ export function ToolPage() {
   const [makeMode, setMakeMode] = useState<MakeMode>('multi')
   const [_layoutChoice, _setLayoutChoice] = useState<LayoutChoice>('auto')
   const [isExporting, setIsExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   // 画像ごとの穴位置・レイアウト設定
   const [imageSettings, setImageSettings] = useState<Record<string, { holeSide: HoleSide; layoutMode: LayoutMode }>>({})
 
@@ -626,16 +635,19 @@ export function ToolPage() {
   const layouts = buildPageLayouts(layoutImages, refill, _layoutChoice)
 
   async function handleUpload(files: FileList) {
-    const loaded = await loadImages(files)
-    setImages((prev) => [...prev, ...loaded])
-    // デフォルト設定を登録
-    setImageSettings((prev) => {
-      const next = { ...prev }
-      for (const img of loaded) {
-        next[img.id] = { holeSide: 'left', layoutMode: 'avoid-ring' }
-      }
-      return next
-    })
+    try {
+      const loaded = await loadImages(files)
+      setImages((prev) => [...prev, ...loaded])
+      setImageSettings((prev) => {
+        const next = { ...prev }
+        for (const img of loaded) {
+          next[img.id] = { holeSide: 'left', layoutMode: 'avoid-ring' }
+        }
+        return next
+      })
+    } catch (e) {
+      alert(`画像の読み込みに失敗しました。\n${e instanceof Error ? e.message : ''}`)
+    }
   }
 
   function handleRemove(id: string) {
@@ -659,6 +671,7 @@ export function ToolPage() {
 
   async function handleExport() {
     if (!images.length || isExporting) return
+    setExportError(null)
     try {
       setIsExporting(true)
       const defaultSetting = { holeSide: 'left' as HoleSide, layoutMode: 'avoid-ring' as LayoutMode }
@@ -675,8 +688,13 @@ export function ToolPage() {
       const a = document.createElement('a')
       a.href = url
       a.download = `ringcraft-${refill.id}.pdf`
+      document.body.appendChild(a)
       a.click()
-      URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      // ダウンロード完了を待ってから解放
+      setTimeout(() => URL.revokeObjectURL(url), 10000)
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : 'PDF生成に失敗しました')
     } finally {
       setIsExporting(false)
     }
@@ -734,6 +752,7 @@ export function ToolPage() {
               onUpdateSetting={handleUpdateSetting}
               onExport={handleExport}
               isExporting={isExporting}
+              exportError={exportError}
             />
           )}
         </div>

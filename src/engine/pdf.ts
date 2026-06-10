@@ -27,6 +27,7 @@ export type ExportPdfOptions = {
 
 async function dataUrlToBytes(dataUrl: string): Promise<Uint8Array> {
   const res = await fetch(dataUrl)
+  if (!res.ok) throw new Error(`画像データの取得に失敗しました (${res.status})`)
   return new Uint8Array(await res.arrayBuffer())
 }
 
@@ -175,11 +176,15 @@ async function drawPage(
       const setting = imageSettings[image.id] ?? defaultSetting
 
       if (!imageCache.has(image.id)) {
-        const bytes = await dataUrlToBytes(image.dataUrl)
-        const embedded = isJpeg(image.dataUrl)
-          ? await pdfDoc.embedJpg(bytes)
-          : await pdfDoc.embedPng(bytes)
-        imageCache.set(image.id, embedded as Awaited<ReturnType<PDFDocument['embedPng']>>)
+        try {
+          const bytes = await dataUrlToBytes(image.dataUrl)
+          const embedded = isJpeg(image.dataUrl)
+            ? await pdfDoc.embedJpg(bytes)
+            : await pdfDoc.embedPng(bytes)
+          imageCache.set(image.id, embedded as Awaited<ReturnType<PDFDocument['embedPng']>>)
+        } catch (e) {
+          throw new Error(`「${image.name}」の埋め込みに失敗しました: ${e instanceof Error ? e.message : e}`)
+        }
       }
 
       drawImageOnPage(page, imageCache.get(image.id)!, slot, refill, setting, pageHeightPt)
