@@ -157,10 +157,16 @@ function Step1({
 
       {/* アップロードエリア */}
       <label className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-dashed border-[#d9cfbe] bg-[#faf6ee] px-4 text-center transition active:bg-blue-50">
-        <span className="text-5xl">🖼️</span>
+        <svg width="64" height="52" viewBox="0 0 64 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* 雲 */}
+          <path d="M50 36H14C8.477 36 4 31.523 4 26C4 21.048 7.486 16.9 12.16 15.8C12.056 15.21 12 14.612 12 14C12 8.477 16.477 4 22 4C25.174 4 27.994 5.468 29.86 7.772C31.076 6.664 32.708 6 34.5 6C38.366 6 41.5 9.134 41.5 13C41.5 13.17 41.494 13.338 41.482 13.506C42.296 13.18 43.178 13 44.1 13C48.46 13 52 16.54 52 20.9C52 21.27 51.974 21.634 51.924 21.99C55.402 23.138 58 26.37 58 30.2C58 33.978 55.478 37.158 52 38.128" stroke="#c9bfad" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          {/* 矢印（上向き） */}
+          <line x1="32" y1="48" x2="32" y2="28" stroke="#ffd24a" strokeWidth="3" strokeLinecap="round"/>
+          <polyline points="24,36 32,28 40,36" fill="none" stroke="#ffd24a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
         <div>
-          <p className="text-base font-bold text-slate-900">写真やスクリーンショットを追加</p>
-          <p className="mt-1 text-[12px] text-slate-400">タップして選択 · 複数まとめて選べます</p>
+          <p className="text-base font-bold text-slate-900">写真を選ぶ</p>
+          <p className="mt-1 text-[12px] text-slate-400">JPG / PNG 対応（最大 50枚まで）</p>
         </div>
         <input
           type="file"
