@@ -377,9 +377,11 @@ function MakeModeIllust({ mode, active }: { mode: MakeMode; active: boolean }) {
 
 function Step3({
   makeMode,
+  imageCount,
   onSelect,
 }: {
   makeMode: MakeMode
+  imageCount: number
   onSelect: (mode: MakeMode) => void
 }) {
   const options = [
@@ -429,6 +431,13 @@ function Step3({
           )
         })}
       </div>
+
+      {/* repeatモードで複数画像がある場合の注意 */}
+      {makeMode === 'repeat' && imageCount > 1 && (
+        <p className="rounded-[12px] bg-amber-50 px-4 py-3 text-[12px] leading-5 text-amber-700">
+          ⚠️ {imageCount}枚選択されていますが、「同じ画像を繰り返す」では1枚目のみ使用されます。
+        </p>
+      )}
     </div>
   )
 }
@@ -741,7 +750,7 @@ export function ToolPage() {
         <div className="mx-auto flex h-full max-w-md flex-col">
           {step === 1 && <Step1 images={images} onUpload={handleUpload} onRemove={handleRemove} onReorder={handleReorder} />}
           {step === 2 && <Step2 refillId={refillId} onSelect={setRefillId} />}
-          {step === 3 && <Step3 makeMode={makeMode} onSelect={setMakeMode} />}
+          {step === 3 && <Step3 makeMode={makeMode} imageCount={images.length} onSelect={setMakeMode} />}
           {step === 4 && (
             <Step4
               images={layoutImages}

@@ -203,12 +203,3 @@ export function ImpositionIllust({ columns, rows, active = false }: { columns: n
   )
 }
 
-// ---------------------------------------------------------------------------
-// AllSizesIllust は削除 → RefillSizePreview に置き換え済み
-// 後方互換のためエクスポートのみ残す
-// ---------------------------------------------------------------------------
-
-export function AllSizesIllust({ activeId }: { activeId: string }) {
-  const refill = REFILL_SIZES.find((s) => s.id === activeId) ?? REFILL_SIZES[0]
-  return <RefillSizePreview refill={refill} />
-}
