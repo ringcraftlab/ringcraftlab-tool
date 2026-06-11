@@ -217,36 +217,39 @@ function Step1({
 // Step 2：手帳サイズを選ぶ
 // ---------------------------------------------------------------------------
 
-const SIZE_COLORS: Record<string, { bg: string; stroke: string; hole: string }> = {
-  mini5:  { bg: '#fce7f3', stroke: '#f472b6', hole: '#ec4899' },
-  mini6:  { bg: '#e0f2fe', stroke: '#38bdf8', hole: '#0ea5e9' },
-  bible:  { bg: '#d1fae5', stroke: '#34d399', hole: '#10b981' },
-  a5:     { bg: '#fef9c3', stroke: '#facc15', hole: '#eab308' },
-}
-
+// サイズアイコン：白い長方形＋正確な縦横比＋穴マーク
 function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
   const pattern = HOLE_PATTERNS[refill.holePatternId]
+  // 表示エリア内に収まるよう縦横比を維持してリサイズ
+  const maxW = 44
   const maxH = 64
-  const aspect = refill.heightMm / refill.widthMm
-  const h = Math.min(maxH, 80)
-  const w = Math.round(h / aspect)
-  const clampedW = Math.min(w, 52)
-  const clampedH = Math.round(clampedW * aspect)
-  const colors = SIZE_COLORS[refill.holePatternId] ?? SIZE_COLORS['bible']
-  const holeX = 5
+  const scaleW = maxW / refill.widthMm
+  const scaleH = maxH / refill.heightMm
+  const scale = Math.min(scaleW, scaleH)
+  const w = Math.round(refill.widthMm * scale)
+  const h = Math.round(refill.heightMm * scale)
   const holeCount = pattern.holeCount
-  const holeSpacing = (clampedH - 10) / (holeCount - 1)
+  const holeX = 4
+  const holeSpacing = (h - 8) / (holeCount - 1)
 
   return (
-    <svg width={clampedW} height={clampedH} viewBox={`0 0 ${clampedW} ${clampedH}`} style={{ display: 'block', flexShrink: 0 }}>
-      <rect x="0" y="0" width={clampedW} height={clampedH} rx="4" fill={active ? colors.bg : '#f8fafc'} stroke={active ? colors.stroke : '#cbd5e1'} strokeWidth="1.5" />
-      <rect x="0" y="0" width="10" height={clampedH} rx="4" fill={active ? colors.bg : '#f1f5f9'} />
-      <rect x="10" y="0" width="2" height={clampedH} fill={active ? colors.bg : '#f1f5f9'} />
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', flexShrink: 0 }}>
+      {/* 本体 */}
+      <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx="3"
+        fill="white"
+        stroke={active ? '#c9a227' : '#cbd5e1'}
+        strokeWidth="1.2" />
+      {/* 穴側の帯 */}
+      <rect x="0.5" y="0.5" width="7" height={h - 1} rx="2.5"
+        fill={active ? '#fef3c7' : '#f1f5f9'} />
+      {/* 穴マーク */}
       {Array.from({ length: holeCount }).map((_, i) => {
-        const cy = 5 + i * holeSpacing
+        const cy = 4 + i * holeSpacing
         return (
-          <circle key={i} cx={holeX} cy={cy} r="2.2"
-            fill="white" stroke={active ? colors.hole : '#94a3b8'} strokeWidth="1.2" />
+          <circle key={i} cx={holeX} cy={cy} r="1.8"
+            fill="white"
+            stroke={active ? '#d97706' : '#94a3b8'}
+            strokeWidth="1" />
         )
       })}
     </svg>
@@ -272,10 +275,9 @@ function Step2({
       </div>
 
       {/* 人気サイズ */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex flex-col gap-2">
         {REFILL_SIZES.map((size) => {
           const isActive = size.id === refillId
-          const pattern = HOLE_PATTERNS[size.holePatternId]
           const descriptions: Record<string, string> = {
             mini5: '小さくて持ち運びに便利。メモや日記にぴったり。',
             mini6: 'たっぷり書けてバランスの良い人気サイズ。',
@@ -288,26 +290,23 @@ function Step2({
               type="button"
               onClick={() => onSelect(size.id)}
               className={[
-                'flex flex-col items-start gap-2 rounded-[16px] border-2 p-3 text-left transition',
-                isActive ? 'border-blue-400 bg-blue-50' : 'border-[#e7dfd2] bg-white',
+                'flex items-center gap-4 rounded-[16px] border-2 px-4 py-3 text-left transition',
+                isActive ? 'border-[#d97706] bg-[#fffbeb]' : 'border-[#e7dfd2] bg-white',
               ].join(' ')}
             >
-              <div className="flex w-full items-start justify-between">
-                <SizeIcon refill={size} active={isActive} />
-                <div className={[
-                  'flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black',
-                  isActive ? 'bg-blue-500 text-white' : 'border border-[#ddd6c8]',
-                ].join(' ')}>
-                  {isActive ? '✓' : ''}
-                </div>
-              </div>
-              <div>
-                <p className={['text-[13px] font-bold', isActive ? 'text-blue-700' : 'text-slate-800'].join(' ')}>
+              <SizeIcon refill={size} active={isActive} />
+              <div className="flex-1">
+                <p className={['text-[14px] font-bold', isActive ? 'text-[#92400e]' : 'text-slate-800'].join(' ')}>
                   {size.label}
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">{size.widthMm}×{size.heightMm}mm</p>
-                <p className="text-[10px] text-slate-400">穴{pattern.holeCount}個</p>
-                <p className="mt-1 text-[10px] leading-4 text-slate-500">{descriptions[size.id]}</p>
+                <p className="text-[12px] text-slate-400 mt-0.5">{size.widthMm} × {size.heightMm} mm</p>
+                <p className="mt-1 text-[11px] leading-4 text-slate-500">{descriptions[size.id]}</p>
+              </div>
+              <div className={[
+                'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-black',
+                isActive ? 'bg-[#d97706] text-white' : 'border border-[#ddd6c8]',
+              ].join(' ')}>
+                {isActive ? '✓' : ''}
               </div>
             </button>
           )
@@ -319,7 +318,7 @@ function Step2({
         <p className="mb-2 text-[12px] font-bold text-slate-500">その他のサイズ</p>
         <div className={[
           'flex items-center gap-3 rounded-[14px] border-2 bg-white px-4 py-3',
-          isOther ? 'border-blue-400' : 'border-[#e7dfd2]',
+          isOther ? 'border-[#d97706]' : 'border-[#e7dfd2]',
         ].join(' ')}>
           <select
             value={isOther ? refillId : ''}
@@ -336,7 +335,6 @@ function Step2({
         </div>
       </div>
 
-      <p className="text-center text-[11px] text-slate-400">あとからサイズは変更できます</p>
     </div>
   )
 }
