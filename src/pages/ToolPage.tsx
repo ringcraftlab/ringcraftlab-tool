@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 import { DEFAULT_TRANSFORM, HOLE_PATTERNS, REFILL_SIZES, REFILL_SIZES_OTHER } from '../constants'
 import { EditSheet } from '../components/EditSheet'
 import { RefillPreview } from '../components/RefillPreview'
-import { buildPageLayouts, getLayoutOptions } from '../engine/layout'
+import { PAPER_SIZES_PRINT, buildPageLayouts, getLayoutOptions, type PrintPaperSizeId } from '../engine/layout'
 import { exportPdf } from '../engine/pdf'
 import { useSwipeBack } from '../hooks/useSwipeBack'
 import type { HoleSide, LayoutChoice, LayoutMode, RefillImage, RefillSize, TransformState } from '../types'
@@ -541,6 +541,8 @@ function Step4({
   onExport,
   isExporting,
   exportError,
+  printPaperId,
+  onChangePrintPaper,
 }: {
   images: RefillImage[]
   refill: RefillSize
@@ -551,6 +553,8 @@ function Step4({
   onExport: () => void
   isExporting: boolean
   exportError: string | null
+  printPaperId: PrintPaperSizeId
+  onChangePrintPaper: (id: PrintPaperSizeId) => void
 }) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const editingImage = images.find((img) => img.id === editingId) ?? null
@@ -562,17 +566,40 @@ function Step4({
     <div className="space-y-3">
       <div>
         <p className="text-[11px] font-bold tracking-[0.1em] text-blue-700">STEP 4</p>
-        <h2 className="mt-1 text-xl font-semibold text-slate-950">確認・PDF出力</h2>
+        <h2 className="mt-1 text-xl font-semibold text-slate-950">プレビュー＆PDF出力</h2>
         <p className="mt-1 text-[12px] text-slate-500">
           印刷イメージです。リフィルをタップして個別に調整できます。
         </p>
       </div>
 
-      {/* A4面付けプレビュー */}
+      {/* 印刷用紙選択 */}
+      <div>
+        <p className="mb-2 text-[12px] font-bold text-slate-500">印刷用紙</p>
+        <div className="flex gap-2">
+          {(Object.keys(PAPER_SIZES_PRINT) as PrintPaperSizeId[]).map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onChangePrintPaper(id)}
+              className={[
+                'flex-1 rounded-[12px] border-2 py-2 text-[13px] font-bold transition',
+                printPaperId === id
+                  ? 'border-[#d97706] bg-[#fffbeb] text-[#92400e]'
+                  : 'border-[#e7dfd2] bg-white text-slate-600',
+              ].join(' ')}
+            >
+              {PAPER_SIZES_PRINT[id].label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 面付けプレビュー */}
       {layouts.map((layout, pageIndex) => (
         <div key={pageIndex}>
           <p className="mb-1.5 text-[11px] font-bold text-slate-400">
-            {pageIndex + 1} / {layouts.length}ページ &nbsp;·&nbsp; {layout.orientation === 'portrait' ? 'A4縦' : 'A4横'}
+            {pageIndex + 1} / {layouts.length}ページ &nbsp;·&nbsp;
+            {PAPER_SIZES_PRINT[printPaperId].label}{layout.orientation === 'portrait' ? '縦' : '横'}
           </p>
           {/* A4用紙 */}
           <div
@@ -707,6 +734,7 @@ export function ToolPage() {
   const [_layoutChoice, _setLayoutChoice] = useState<LayoutChoice>('auto')
   const [isExporting, setIsExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [printPaperId, setPrintPaperId] = useState<PrintPaperSizeId>('a4')
   // 画像ごとの穴位置・レイアウト設定
   const [imageSettings, setImageSettings] = useState<Record<string, { holeSide: HoleSide; layoutMode: LayoutMode }>>({})
 
@@ -715,13 +743,13 @@ export function ToolPage() {
   // repeatモード：1枚目の画像をA4いっぱいに複製
   const layoutImages = (() => {
     if (makeMode === 'repeat' && images.length > 0) {
-      const { maxCount } = getLayoutOptions(refill)
+      const { maxCount } = getLayoutOptions(refill, printPaperId)
       return Array.from({ length: maxCount }, () => images[0])
     }
     return images
   })()
 
-  const layouts = buildPageLayouts(layoutImages, refill, _layoutChoice)
+  const layouts = buildPageLayouts(layoutImages, refill, _layoutChoice, printPaperId)
 
   async function handleUpload(files: FileList) {
     try {
@@ -842,6 +870,8 @@ export function ToolPage() {
               onExport={handleExport}
               isExporting={isExporting}
               exportError={exportError}
+              printPaperId={printPaperId}
+              onChangePrintPaper={setPrintPaperId}
             />
           )}
         </div>

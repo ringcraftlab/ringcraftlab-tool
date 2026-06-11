@@ -1,4 +1,4 @@
-import { HOLE_PATTERNS, PAPER_A4 } from '../constants'
+import { HOLE_PATTERNS } from '../constants'
 import type {
   HoleSide,
   LayoutChoice,
@@ -114,9 +114,17 @@ function findBestGrid(
 // 配置可能な最大枚数と選択肢
 // ---------------------------------------------------------------------------
 
-export function getLayoutOptions(refill: RefillSize) {
-  const portrait = PAPER_A4
-  const landscape = { widthMm: PAPER_A4.heightMm, heightMm: PAPER_A4.widthMm }
+export const PAPER_SIZES_PRINT = {
+  a4: { widthMm: 210, heightMm: 297, label: 'A4' },
+  a5: { widthMm: 148, heightMm: 210, label: 'A5' },
+} as const
+
+export type PrintPaperSizeId = keyof typeof PAPER_SIZES_PRINT
+
+export function getLayoutOptions(refill: RefillSize, paperId: PrintPaperSizeId = 'a4') {
+  const paper = PAPER_SIZES_PRINT[paperId]
+  const portrait = paper
+  const landscape = { widthMm: paper.heightMm, heightMm: paper.widthMm }
 
   const maxPortrait =
     Math.floor(portrait.widthMm / refill.widthMm) *
@@ -141,12 +149,14 @@ export function buildPageLayouts(
   images: RefillImage[],
   refill: RefillSize,
   layoutChoice: LayoutChoice,
+  paperId: PrintPaperSizeId = 'a4',
 ): PageLayout[] {
-  const { maxCount } = getLayoutOptions(refill)
+  const { maxCount } = getLayoutOptions(refill, paperId)
   const desiredCount = layoutChoice === 'auto' ? maxCount : layoutChoice
 
-  const portrait = PAPER_A4
-  const landscape = { widthMm: PAPER_A4.heightMm, heightMm: PAPER_A4.widthMm }
+  const paper = PAPER_SIZES_PRINT[paperId]
+  const portrait = paper
+  const landscape = { widthMm: paper.heightMm, heightMm: paper.widthMm }
 
   const portraitGrid = findBestGrid(portrait.widthMm, portrait.heightMm, refill, desiredCount)
   const landscapeGrid = findBestGrid(landscape.widthMm, landscape.heightMm, refill, desiredCount)
@@ -162,8 +172,8 @@ export function buildPageLayouts(
   if (!grid) return []
 
   const orientation = useLandscape ? 'landscape' : 'portrait'
-  const pageWidthMm = useLandscape ? PAPER_A4.heightMm : PAPER_A4.widthMm
-  const pageHeightMm = useLandscape ? PAPER_A4.widthMm : PAPER_A4.heightMm
+  const pageWidthMm = useLandscape ? paper.heightMm : paper.widthMm
+  const pageHeightMm = useLandscape ? paper.widthMm : paper.heightMm
   const slotsPerPage = grid.capacity
   const pageCount = Math.max(1, Math.ceil(images.length / slotsPerPage))
 
