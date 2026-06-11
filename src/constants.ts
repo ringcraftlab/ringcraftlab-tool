@@ -67,13 +67,6 @@ export const REFILL_SIZES: RefillSize[] = [
     holePatternId: 'mini5',
   },
   {
-    id: 'mini5-square',
-    label: 'ミニ5スクエア',
-    widthMm: 105,
-    heightMm: 105,
-    holePatternId: 'mini5',
-  },
-  {
     id: 'mini6',
     label: 'ミニ6',
     widthMm: 80,
@@ -91,6 +84,30 @@ export const REFILL_SIZES: RefillSize[] = [
     id: 'a5',
     label: 'A5',
     widthMm: 148,
+    heightMm: 210,
+    holePatternId: 'a5',
+  },
+]
+
+export const REFILL_SIZES_OTHER: RefillSize[] = [
+  {
+    id: 'mini5-square',
+    label: 'ミニ5スクエア',
+    widthMm: 105,
+    heightMm: 105,
+    holePatternId: 'mini5',
+  },
+  {
+    id: 'narrow',
+    label: 'ナロー',
+    widthMm: 80,
+    heightMm: 170,
+    holePatternId: 'bible',
+  },
+  {
+    id: 'a5-slim',
+    label: 'A5スリム',
+    widthMm: 105,
     heightMm: 210,
     holePatternId: 'a5',
   },
