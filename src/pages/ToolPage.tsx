@@ -217,10 +217,16 @@ function Step1({
 // Step 2：手帳サイズを選ぶ
 // ---------------------------------------------------------------------------
 
-// サイズアイコン：白い長方形＋正確な縦横比＋穴マーク
+const SIZE_ICON_COLORS: Record<string, { bg: string; band: string; hole: string; border: string }> = {
+  mini5:  { bg: '#fce7f3', band: '#fbcfe8', hole: '#ec4899', border: '#f9a8d4' },
+  mini6:  { bg: '#e0f2fe', band: '#bae6fd', hole: '#0ea5e9', border: '#7dd3fc' },
+  bible:  { bg: '#d1fae5', band: '#a7f3d0', hole: '#10b981', border: '#6ee7b7' },
+  a5:     { bg: '#fef9c3', band: '#fef08a', hole: '#eab308', border: '#fde047' },
+}
+
+// サイズアイコン：正確な縦横比＋常時カラー表示
 function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
   const pattern = HOLE_PATTERNS[refill.holePatternId]
-  // 表示エリア内に収まるよう縦横比を維持してリサイズ
   const maxW = 44
   const maxH = 64
   const scaleW = maxW / refill.widthMm
@@ -231,24 +237,25 @@ function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
   const holeCount = pattern.holeCount
   const holeX = 4
   const holeSpacing = (h - 8) / (holeCount - 1)
+  const colors = SIZE_ICON_COLORS[refill.holePatternId] ?? SIZE_ICON_COLORS['bible']
 
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', flexShrink: 0 }}>
       {/* 本体 */}
       <rect x="0.5" y="0.5" width={w - 1} height={h - 1} rx="3"
-        fill="white"
-        stroke={active ? '#c9a227' : '#cbd5e1'}
-        strokeWidth="1.2" />
+        fill={colors.bg}
+        stroke={active ? colors.hole : colors.border}
+        strokeWidth={active ? '1.8' : '1.2'} />
       {/* 穴側の帯 */}
       <rect x="0.5" y="0.5" width="7" height={h - 1} rx="2.5"
-        fill={active ? '#fef3c7' : '#f1f5f9'} />
+        fill={colors.band} />
       {/* 穴マーク */}
       {Array.from({ length: holeCount }).map((_, i) => {
         const cy = 4 + i * holeSpacing
         return (
           <circle key={i} cx={holeX} cy={cy} r="1.8"
             fill="white"
-            stroke={active ? '#d97706' : '#94a3b8'}
+            stroke={colors.hole}
             strokeWidth="1" />
         )
       })}
