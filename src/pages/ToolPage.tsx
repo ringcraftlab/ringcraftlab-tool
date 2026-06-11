@@ -217,14 +217,6 @@ function Step1({
 // Step 2：手帳サイズを選ぶ
 // ---------------------------------------------------------------------------
 
-// 穴の実際のY座標（mm単位、リフィルのmm座標系で描画）
-const HOLE_POS_Y: Record<string, number[]> = {
-  mini5:  [14.5, 33.5, 52.5, 71.5, 90.5],
-  mini6:  [15.5, 34.5, 53.5, 72.5, 91.5, 110.5],
-  bible:  [21.5, 40.5, 59.5, 110.5, 129.5, 148.5],
-  a5:     [28, 54, 80, 130, 156, 182],
-}
-
 const SIZE_ICON_COLORS: Record<string, { bg: string; hole: string; guide: string }> = {
   mini5:  { bg: '#fce7f3', hole: '#ec4899', guide: '#f9a8d4' },
   mini6:  { bg: '#e0f2fe', hole: '#0ea5e9', guide: '#7dd3fc' },
@@ -232,9 +224,10 @@ const SIZE_ICON_COLORS: Record<string, { bg: string; hole: string; guide: string
   a5:     { bg: '#fef9c3', hole: '#eab308', guide: '#fde047' },
 }
 
-// ringcraft-lab-cleanのRefillSizeIconを参考に移植
 function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
-  // 表示サイズ（形の差を強調するため少し誇張）
+  const pattern = HOLE_PATTERNS[refill.holePatternId]
+  const colors = SIZE_ICON_COLORS[refill.holePatternId] ?? SIZE_ICON_COLORS['bible']
+  // 形の差を強調するため表示サイズは誇張
   const DISPLAY: Record<string, { w: number; h: number }> = {
     mini5:  { w: 30, h: 64 },
     mini6:  { w: 38, h: 66 },
@@ -242,10 +235,9 @@ function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
     a5:     { w: 52, h: 80 },
   }
   const display = DISPLAY[refill.id] ?? { w: 44, h: 76 }
-  const holePosY = HOLE_POS_Y[refill.holePatternId] ?? []
-  const colors = SIZE_ICON_COLORS[refill.holePatternId] ?? SIZE_ICON_COLORS['bible']
   const HOLE_ZONE_MM = 6.5
   const holeCx = HOLE_ZONE_MM * 0.42
+  const centerY = refill.heightMm / 2
 
   return (
     <svg
@@ -253,17 +245,14 @@ function SizeIcon({ refill, active }: { refill: RefillSize; active: boolean }) {
       viewBox={`0 0 ${refill.widthMm} ${refill.heightMm}`}
       style={{ display: 'block', flexShrink: 0 }}
     >
-      {/* 本体 */}
       <rect x="0.8" y="0.8" width={refill.widthMm - 1.6} height={refill.heightMm - 1.6}
         rx="2.5" fill={colors.bg}
         stroke={active ? colors.hole : colors.guide}
         strokeWidth={active ? 1.8 : 1.2} />
-      {/* 穴ゾーンの点線ガイド */}
       <line x1={HOLE_ZONE_MM} y1="1" x2={HOLE_ZONE_MM} y2={refill.heightMm - 1}
         stroke={colors.guide} strokeWidth="1.2" strokeDasharray="2.5 2" opacity="0.6" />
-      {/* 穴マーク（実際の位置） */}
-      {holePosY.map((y, i) => (
-        <circle key={i} cx={holeCx} cy={y} r="2.4"
+      {pattern.centerOffsetsMm.map((offset, i) => (
+        <circle key={i} cx={holeCx} cy={centerY + offset} r="2.4"
           fill="white" stroke={colors.hole} strokeWidth="1.6" />
       ))}
     </svg>
