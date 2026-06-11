@@ -578,12 +578,13 @@ function Step4({
         <div className="flex gap-2">
           {(Object.keys(PAPER_SIZES_PRINT) as PrintPaperSizeId[]).map((id) => {
             const active = printPaperId === id
-            // A4=210x297をベースに共通スケールで描画 → A5は自然に小さくなる
-            const BASE_SCALE = 0.16  // 297mm → 約48px
-            const pw = PAPER_SIZES_PRINT[id].widthMm
-            const ph = PAPER_SIZES_PRINT[id].heightMm
-            const iw = Math.round(pw * BASE_SCALE)
-            const ih = Math.round(ph * BASE_SCALE)
+            // 共通スケール: A4(210×297)をW=34 H=48に
+            const S = 48 / 297
+            const a4w = Math.round(210 * S), a4h = 48
+            const a5w = Math.round(148 * S), a5h = Math.round(210 * S)
+            const isA4 = id === 'a4'
+            const svgW = a4w + 8
+            const svgH = a4h + 4
             return (
               <button
                 key={id}
@@ -594,20 +595,22 @@ function Step4({
                   active ? 'border-[#d97706] bg-[#fffbeb]' : 'border-[#e7dfd2] bg-white',
                 ].join(' ')}
               >
-                <svg width={iw} height={ih} viewBox={`0 0 ${iw} ${ih}`} style={{ display: 'block' }}>
-                  <rect x="0.5" y="0.5" width={iw - 1} height={ih - 1} rx="2"
-                    fill={active ? '#fef3c7' : '#f8fafc'}
-                    stroke={active ? '#d97706' : '#94a3b8'}
-                    strokeWidth="1.2" />
-                  {/* 折り目の三角 */}
-                  <polyline points={`${iw - 6},0.5 ${iw - 0.5},6`}
-                    fill="none" stroke={active ? '#d97706' : '#94a3b8'} strokeWidth="1" />
-                  {/* 罫線3本 */}
-                  {[0.3, 0.5, 0.7].map((r, i) => (
-                    <line key={i}
-                      x1="3" y1={ih * r} x2={iw - 3} y2={ih * r}
-                      stroke={active ? '#fbbf24' : '#e2e8f0'} strokeWidth="1" />
-                  ))}
+                {/* A4とA5を同スケールで重ねて比較 */}
+                <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} style={{ display: 'block' }}>
+                  {/* A4（大きい方・後ろ） */}
+                  <rect x="0.5" y={svgH - a4h - 0.5} width={a4w - 1} height={a4h - 1} rx="2"
+                    fill={isA4 && active ? '#fef3c7' : isA4 ? '#f8fafc' : '#f1f5f9'}
+                    stroke={isA4 && active ? '#d97706' : '#cbd5e1'}
+                    strokeWidth={isA4 && active ? 1.5 : 1} />
+                  <text x={a4w / 2} y={svgH - 4} textAnchor="middle"
+                    fontSize="5" fill={isA4 && active ? '#d97706' : '#94a3b8'} fontWeight="bold">A4</text>
+                  {/* A5（小さい方・前） */}
+                  <rect x={a4w - a5w + 4} y={svgH - a5h - 0.5} width={a5w - 1} height={a5h - 1} rx="2"
+                    fill={!isA4 && active ? '#fef3c7' : !isA4 ? '#f8fafc' : '#f8fafc'}
+                    stroke={!isA4 && active ? '#d97706' : '#94a3b8'}
+                    strokeWidth={!isA4 && active ? 1.5 : 1} />
+                  <text x={a4w - a5w + 4 + a5w / 2} y={svgH - 4} textAnchor="middle"
+                    fontSize="5" fill={!isA4 && active ? '#d97706' : '#94a3b8'} fontWeight="bold">A5</text>
                 </svg>
                 <span className={['text-[12px] font-bold', active ? 'text-[#92400e]' : 'text-slate-600'].join(' ')}>
                   {PAPER_SIZES_PRINT[id].label}
