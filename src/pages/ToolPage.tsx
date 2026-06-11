@@ -576,21 +576,46 @@ function Step4({
       <div>
         <p className="mb-2 text-[12px] font-bold text-slate-500">印刷用紙</p>
         <div className="flex gap-2">
-          {(Object.keys(PAPER_SIZES_PRINT) as PrintPaperSizeId[]).map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onChangePrintPaper(id)}
-              className={[
-                'flex-1 rounded-[12px] border-2 py-2 text-[13px] font-bold transition',
-                printPaperId === id
-                  ? 'border-[#d97706] bg-[#fffbeb] text-[#92400e]'
-                  : 'border-[#e7dfd2] bg-white text-slate-600',
-              ].join(' ')}
-            >
-              {PAPER_SIZES_PRINT[id].label}
-            </button>
-          ))}
+          {(Object.keys(PAPER_SIZES_PRINT) as PrintPaperSizeId[]).map((id) => {
+            const active = printPaperId === id
+            // A4=210x297, A5=148x210 → 最大高さ48pxに正規化
+            const pw = PAPER_SIZES_PRINT[id].widthMm
+            const ph = PAPER_SIZES_PRINT[id].heightMm
+            const maxH = 40
+            const scale = maxH / ph
+            const iw = Math.round(pw * scale)
+            const ih = maxH
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onChangePrintPaper(id)}
+                className={[
+                  'flex flex-1 flex-col items-center gap-2 rounded-[12px] border-2 py-3 transition',
+                  active ? 'border-[#d97706] bg-[#fffbeb]' : 'border-[#e7dfd2] bg-white',
+                ].join(' ')}
+              >
+                <svg width={iw} height={ih} viewBox={`0 0 ${iw} ${ih}`} style={{ display: 'block' }}>
+                  <rect x="0.5" y="0.5" width={iw - 1} height={ih - 1} rx="2"
+                    fill={active ? '#fef3c7' : '#f8fafc'}
+                    stroke={active ? '#d97706' : '#94a3b8'}
+                    strokeWidth="1.2" />
+                  {/* 折り目の三角 */}
+                  <polyline points={`${iw - 6},0.5 ${iw - 0.5},6`}
+                    fill="none" stroke={active ? '#d97706' : '#94a3b8'} strokeWidth="1" />
+                  {/* 罫線3本 */}
+                  {[0.3, 0.5, 0.7].map((r, i) => (
+                    <line key={i}
+                      x1="3" y1={ih * r} x2={iw - 3} y2={ih * r}
+                      stroke={active ? '#fbbf24' : '#e2e8f0'} strokeWidth="1" />
+                  ))}
+                </svg>
+                <span className={['text-[12px] font-bold', active ? 'text-[#92400e]' : 'text-slate-600'].join(' ')}>
+                  {PAPER_SIZES_PRINT[id].label}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
