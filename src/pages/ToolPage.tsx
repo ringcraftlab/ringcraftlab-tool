@@ -578,13 +578,12 @@ function Step4({
         <div className="flex gap-2">
           {(Object.keys(PAPER_SIZES_PRINT) as PrintPaperSizeId[]).map((id) => {
             const active = printPaperId === id
-            // A4=210x297, A5=148x210 → 最大高さ48pxに正規化
+            // A4=210x297をベースに共通スケールで描画 → A5は自然に小さくなる
+            const BASE_SCALE = 0.16  // 297mm → 約48px
             const pw = PAPER_SIZES_PRINT[id].widthMm
             const ph = PAPER_SIZES_PRINT[id].heightMm
-            const maxH = 40
-            const scale = maxH / ph
-            const iw = Math.round(pw * scale)
-            const ih = maxH
+            const iw = Math.round(pw * BASE_SCALE)
+            const ih = Math.round(ph * BASE_SCALE)
             return (
               <button
                 key={id}
